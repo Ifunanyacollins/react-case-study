@@ -1,0 +1,48 @@
+.undoBar {
+  position: fixed; 
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%); 
+  background: var(--color-text-primary, #333);
+  color: var(--color-bg-primary, #fff);
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 1000;
+  
+
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.message {
+  font-size: 14px;
+}
+
+.undoButton {
+  background: none;
+  border: none;
+  color: var(--color-accent, #4e88e8);
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.undoButton:hover {
+  text-decoration: underline;
+}
