@@ -42,5 +42,4 @@ export const useRecentlyAccessed = create<RecentlyAccessedState>(
   })
 );
 
-// Immediately load the list from localStorage when the app starts
 useRecentlyAccessed.getState().load();

@@ -1,41 +1,31 @@
-import { Link } from "react-router-dom";
-import { useRecentlyAccessed } from "../../hooks/useRecentlyAccessed";
+import { NavLink } from "react-router-dom";
 import styles from "./navigation.module.css";
+import { ThemeToggle } from "../ThemeToggle";
 
 export const Navigation = () => {
-  const recentlyAccessed = useRecentlyAccessed(
-    (state) => state.recentlyAccessed
-  );
-
   return (
     <nav className={styles.nav}>
       <div className={styles.mainLinks}>
-        <Link to="/board" className={styles.navLink}>
+        <NavLink
+          to="/board"
+          className={({ isActive }) =>
+            `${styles.navLink} ${isActive ? styles.active : ""}`
+          }
+        >
           Board
-        </Link>
-        <Link to="/settings" className={styles.navLink}>
+        </NavLink>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `${styles.navLink} ${isActive ? styles.active : ""}`
+          }
+        >
           Settings
-        </Link>
+        </NavLink>
       </div>
 
-      <div className={styles.recentLinks}>
-        <span className={styles.recentTitle}>Recent:</span>
-        {recentlyAccessed.length > 0 ? (
-          recentlyAccessed.map((issue) => (
-            <Link
-              key={issue.id}
-              to={`/issue/${issue.id}`}
-              className={styles.recentLink}
-              title={issue.title}
-            >
-              {issue.title.substring(0, 15)}...
-            </Link>
-          ))
-        ) : (
-          <span style={{ fontSize: "14px", color: "#888" }}>
-            No recent issues
-          </span>
-        )}
+      <div className={styles.themeToggleWrapper}>
+        <ThemeToggle />
       </div>
     </nav>
   );

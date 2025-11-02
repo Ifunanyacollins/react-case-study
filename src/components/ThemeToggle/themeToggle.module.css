@@ -1,0 +1,64 @@
+.toggleButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 4rem; 
+  height: 2rem; 
+  border-radius: 9999px;
+  background-color: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.toggleButton:hover {
+  border-color: var(--color-accent);
+}
+
+.toggleCircle {
+  position: absolute;
+  width: 1.5rem; 
+  height: 1.5rem; 
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.lightIndicator {
+  position: absolute;
+  left: 0.5rem; 
+  width: 1rem; 
+  height: 1rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+.lightIcon {
+  width: 0.75rem; 
+  height: 0.75rem; 
+  border-radius: 50%;
+  background-color: #facc15; 
+}
+
+.darkIndicator {
+  position: absolute;
+  right: 0.5rem; 
+  width: 1rem; 
+  height: 1rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+.darkIcon {
+  width: 0.75rem; 
+  height: 0.75rem; 
+  border-radius: 50%;
+  background-color: var(--color-text-secondary); 
+}
+
+
+.placeholder {
+  width: 4rem;
+  height: 2rem;
+}

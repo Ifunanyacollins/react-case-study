@@ -1,14 +1,23 @@
 .filterBar {
   display: flex;
   flex-wrap: wrap; 
-  gap: 1rem;
+  gap: 1.5rem; 
   align-items: center;
-  padding: 1rem;
-  background: var(--color-bg-secondary, #f4f4f4);
-  color: var(--color-text-primary, #111);
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  padding: 1rem 0; 
+  background: var(--color-bg-primary, #fff); 
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  margin-bottom: 0;
   transition: background-color 0.2s, color 0.2s;
+  justify-content: space-between;
+}
+
+
+.filterControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .filterGroup {
@@ -17,12 +26,81 @@
   gap: 0.5rem;
 }
 
+.filterGroup label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
 .select,
 .input {
-  padding: 0.5rem;
+  padding: 0.5rem 0.75rem;
   font-size: 14px;
-  background: var(--color-bg-primary, #fff);
+  font-family: var(--font-primary);
+  background: var(--color-bg-secondary, #fff); 
   color: var(--color-text-primary, #111);
   border: 1px solid var(--color-border, #ccc);
-  border-radius: 4px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.select:hover,
+.input:hover,
+.select:focus,
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+  outline: none;
+}
+
+
+.recentButtonWrapper {
+  margin-left: auto; 
+}
+
+.recentButton {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recentButton:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+
+.modalList {
+  display: flex;
+  flex-direction: column; 
+  gap: 0.75rem;
+}
+
+.modalCardLink {
+  display: block;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-bg-primary, #fff);
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent, #007bff);
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.modalCardLink:hover {
+  border-color: var(--color-accent, #007bff);
+  background: var(--color-bg-secondary, #f9f9f9);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
 }

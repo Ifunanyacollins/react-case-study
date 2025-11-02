@@ -1,21 +1,20 @@
 import { create } from "zustand";
 import { Issue, IssuePriority, IssueStatus } from "../types";
-import { mockFetchIssues } from "../utils/api";
+import { mockFetchIssues, mockUpdateIssue } from "../utils/api";
 
 export interface IssueFilters {
   searchTerm: string;
   assignee: string;
   priority: IssuePriority | "all";
 }
-
 interface UndoState {
   issueId: string;
   fromStatus: IssueStatus;
   newStatus: IssueStatus;
   timerId: NodeJS.Timeout;
   message: string;
+  previousIssues: Issue[];
 }
-
 interface IssueStoreState {
   issues: Issue[];
   isLoading: boolean;
@@ -23,7 +22,7 @@ interface IssueStoreState {
   filters: IssueFilters;
   assignees: string[];
   undoState: UndoState | null;
-  lastSync: Date | null; // <-- 1. Add lastSync to state
+  lastSync: Date | null;
 
   fetchIssues: () => Promise<void>;
   setFilters: (newFilters: Partial<IssueFilters>) => void;
@@ -35,17 +34,22 @@ export const useIssueStore = create<IssueStoreState>((set, get) => ({
   issues: [],
   isLoading: false,
   error: null,
-  lastSync: null,
-  filters: {
-    searchTerm: "",
-    assignee: "all",
-    priority: "all",
-  },
+  filters: { searchTerm: "", assignee: "all", priority: "all" },
   assignees: [],
   undoState: null,
+  lastSync: null,
 
   fetchIssues: async () => {
-    set({ error: null });
+    if (get().undoState) {
+      return;
+    }
+
+    const isInitialFetch = get().lastSync === null;
+    if (isInitialFetch) {
+      set({ isLoading: true, error: null });
+    } else {
+      set({ error: null });
+    }
 
     try {
       const fetchedIssues = (await mockFetchIssues()) as Issue[];
@@ -56,16 +60,12 @@ export const useIssueStore = create<IssueStoreState>((set, get) => ({
         issues: fetchedIssues,
         assignees: uniqueAssignees,
         lastSync: new Date(),
+        isLoading: false,
       });
     } catch (err) {
       const errorMsg =
         err instanceof Error ? err.message : "Failed to fetch issues";
-
-      if (!get().lastSync) {
-        set({ error: errorMsg, isLoading: false });
-      } else {
-        console.error("Polling fetch failed:", errorMsg);
-      }
+      set({ error: errorMsg, isLoading: false });
     }
   },
 
@@ -77,15 +77,13 @@ export const useIssueStore = create<IssueStoreState>((set, get) => ({
 
   moveIssue: (issueId: string, newStatus: IssueStatus) => {
     const { issues, undoState } = get();
-
-    if (undoState) {
-      clearTimeout(undoState.timerId);
-    }
+    if (undoState) clearTimeout(undoState.timerId);
 
     const issueToMove = issues.find((i) => i.id === issueId);
-    if (!issueToMove) return;
+    if (!issueToMove || issueToMove.status === newStatus) return;
 
     const fromStatus = issueToMove.status;
+    const previousIssues = issues;
 
     const newIssues = issues.map((i) =>
       i.id === issueId ? { ...i, status: newStatus } : i
@@ -93,6 +91,13 @@ export const useIssueStore = create<IssueStoreState>((set, get) => ({
 
     const newTimerId = setTimeout(() => {
       set({ undoState: null });
+
+      mockUpdateIssue(issueId, { status: newStatus }).catch((err) => {
+        set({
+          error: `Failed to move "${issueToMove.title}". Reverting.`,
+          issues: previousIssues,
+        });
+      });
     }, 5000);
 
     set({
@@ -106,24 +111,18 @@ export const useIssueStore = create<IssueStoreState>((set, get) => ({
           0,
           20
         )}..." to ${newStatus}`,
+        previousIssues: previousIssues,
       },
     });
   },
 
   undoMove: () => {
-    const { issues, undoState } = get();
+    const { undoState } = get();
     if (!undoState) return;
 
-    const { issueId, fromStatus, timerId } = undoState;
-
-    clearTimeout(timerId);
-
-    const revertedIssues = issues.map((i) =>
-      i.id === issueId ? { ...i, status: fromStatus } : i
-    );
-
+    clearTimeout(undoState.timerId);
     set({
-      issues: revertedIssues,
+      issues: undoState.previousIssues,
       undoState: null,
     });
   },

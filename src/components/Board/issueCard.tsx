@@ -1,62 +1,107 @@
 import React from "react";
-import { Issue, IssueStatus } from "../../types";
+import { useNavigate } from "react-router-dom";
+import { Issue } from "../../types";
 import dayjs from "dayjs";
 import styles from "./board.module.css";
 import { useAuth } from "../../context/UserContext";
-
-const getPossibleActions = (status: IssueStatus) => {
-  switch (status) {
-    case "Backlog":
-      return [{ label: "Start >", newStatus: "In Progress" as IssueStatus }];
-    case "In Progress":
-      return [
-        { label: "< Backlog", newStatus: "Backlog" as IssueStatus },
-        { label: "Done >", newStatus: "Done" as IssueStatus },
-      ];
-    case "Done":
-      return [{ label: "< Re-open", newStatus: "In Progress" as IssueStatus }];
-    default:
-      return [];
-  }
-};
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 interface IssueCardProps {
   issue: Issue;
-  onMove: (issueId: string, newStatus: IssueStatus) => void;
+  isOverlay?: boolean;
 }
 
-export const IssueCard = ({ issue, onMove }: IssueCardProps) => {
+export const IssueCard = ({ issue, isOverlay = false }: IssueCardProps) => {
   const { isAdmin } = useAuth();
-  const possibleActions = getPossibleActions(issue.status);
+  const navigate = useNavigate();
   const createdDate = dayjs(issue.createdAt).format("MMM D");
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: issue.id,
+      data: { status: issue.status },
+      disabled: !isAdmin,
+    });
+
+  const style: React.CSSProperties = {
+    transform: isOverlay ? undefined : CSS.Translate.toString(transform),
+    opacity: isDragging ? 0 : 1,
+    zIndex: isDragging ? 0 : "auto",
+    cursor: isOverlay ? "grabbing" : "pointer",
+  };
+
+  const getPriorityClass = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return styles.high;
+      case "medium":
+        return styles.medium;
+      case "low":
+        return styles.low;
+      default:
+        return "";
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isDragging) return;
+    navigate(`/issue/${issue.id}`);
+  };
+
   return (
-    <div className={styles.card}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`${styles.card} ${isOverlay ? styles.dragging : ""}`}
+      onClick={handleClick}
+    >
+      {isAdmin && (
+        <div {...listeners} className={styles.dragHandle}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide-grip"
+          >
+            <circle cx="12" cy="5" r="1" />
+            <circle cx="19" cy="5" r="1" />
+            <circle cx="5" cy="5" r="1" />
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
+            <circle cx="12" cy="19" r="1" />
+            <circle cx="19" cy="19" r="1" />
+            <circle cx="5" cy="19" r="1" />
+          </svg>
+        </div>
+      )}
+
       <div className={styles.cardHeader}>{issue.title}</div>
-      <p>
-        <strong>Priority:</strong> {issue.priority} | <strong>Severity:</strong>{" "}
-        {issue.severity}
-      </p>
-      <p>
-        <strong>Tags:</strong> {issue.tags.join(", ")}
-      </p>
+
+      <div className={styles.cardMeta}>
+        <span
+          className={`${styles.priority} ${getPriorityClass(issue.priority)}`}
+        >
+          {issue.priority}
+        </span>
+        {issue.tags.map((tag) => (
+          <span key={tag} className={styles.tag}>
+            {tag}
+          </span>
+        ))}
+      </div>
 
       <div className={styles.cardFooter}>
-        <span>
-          {issue.assignee} (Added: {createdDate})
-        </span>
-        <div className={styles.buttonGroup}>
-          {isAdmin &&
-            possibleActions.map((action) => (
-              <button
-                key={action.newStatus}
-                className={styles.moveButton}
-                onClick={() => onMove(issue.id, action.newStatus)}
-              >
-                {action.label}
-              </button>
-            ))}
-        </div>
+        <span>{issue.assignee}</span>
+        <span>Added: {createdDate}</span>
       </div>
     </div>
   );

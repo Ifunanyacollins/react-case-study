@@ -1,38 +1,54 @@
-
 .nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: var(--color-bg-secondary, #eee);
+  padding: 0 1rem; 
+  background: var(--color-bg-primary, #fff);
   border-bottom: 1px solid var(--color-border, #ccc);
   color: var(--color-text-primary, #111);
   transition: background-color 0.2s, border-color 0.2s;
+  justify-content: space-between;
 }
 
 .mainLinks {
   display: flex;
-  gap: 1rem;
-  margin-right: 1.5rem;
-  padding-right: 1.5rem;
-  border-right: 1px solid var(--color-border, #ccc);
+  gap: 0.5rem; 
+  
 }
 
 .navLink {
   text-decoration: none;
-  font-weight: bold;
-  color: var(--color-text-primary, #111);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  font-weight: 600; 
+  color: var(--color-text-secondary, #555);
+  padding: 1rem 0.5rem;
+  border-bottom: 3px solid transparent; 
+  transition: color 0.2s, border-color 0.2s;
 }
 .navLink:hover {
-  background: var(--color-bg-tertiary, #e0e0e0);
+  background: none;
+  color: var(--color-text-primary, #111);
+}
+.navLink.active {
+  color: var(--color-accent, #6B46C1);
+  border-bottom-color: var(--color-accent, #6B46C1);
 }
 
 .recentLinks {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  
+ 
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none; 
+}
+
+@media (min-width: 768px) {
+  .recentLinks {
+    display: flex;
+  }
 }
 
 .recentTitle {
@@ -40,15 +56,20 @@
   color: var(--color-text-secondary, #555);
   margin-right: 0.25rem;
 }
-
 .recentLink {
   text-decoration: none;
   font-size: 14px;
   color: var(--color-accent, #007bff);
-  background: var(--color-bg-tertiary, #e0e0e0);
+  background: var(--color-bg-secondary, #e0e0e0);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
 }
 .recentLink:hover {
   text-decoration: underline;
+}
+
+
+.themeToggleWrapper {
+  display: flex;
+  align-items: center;
 }
