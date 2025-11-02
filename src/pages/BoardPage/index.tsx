@@ -13,6 +13,7 @@ import {
 import { Issue, IssueStatus } from "../../types";
 import { sortIssues } from "../../utils/sorting";
 import { IssueCard } from "../../components/Board/issueCard";
+import { BoardSkeleton } from "../../components/SkeletonLoader";
 
 export const BoardPage = () => {
   const { moveIssue } = useIssueStore.getState();
@@ -74,21 +75,33 @@ export const BoardPage = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
     setActiveId(null);
+
     if (!over || !active) return;
     if (active.id === over.id) return;
+
     const issueId = active.id as string;
     const newStatus = over.id as IssueStatus;
+
     moveIssue(issueId, newStatus);
   };
 
   if (isLoading && !lastSync) {
     return (
-      <div className={`${styles.pageWrapper} ${styles.loading}`}>
-        Loading issues...
+      <div className={styles.pageWrapper}>
+        <div className={styles.header}>
+          <h1>Issue Board</h1>
+          <div className={styles.syncStatus}>Last Sync: Never</div>
+        </div>
+
+        <FilterBar />
+
+        <BoardSkeleton />
       </div>
     );
   }
+
   if (error) {
     return (
       <div className={`${styles.pageWrapper} ${styles.error}`}>
@@ -104,6 +117,7 @@ export const BoardPage = () => {
           <h1>Issue Board</h1>
           <div className={styles.syncStatus}>Last Sync: {syncTime}</div>
         </div>
+
         <FilterBar />
 
         <Board>
@@ -119,7 +133,9 @@ export const BoardPage = () => {
           />
           <Board.Column title="Done" status="Done" issues={columns.done} />
         </Board>
+
         <UndoBar />
+
         <DragOverlay>
           {activeIssue ? (
             <IssueCard issue={activeIssue} isOverlay={true} />
